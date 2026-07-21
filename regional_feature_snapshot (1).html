@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regional Feature Snapshot</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --paper:#FDFBFF;
+    --surface:#FFFFFF;
+    --ink:#2D0649;
+    --muted:#6E5C82;
+    --line:#E9D9FF;
+
+    --primary:#A569FF;
+    --secondary:#7622D7;
+    --deep:#460078;
+    --tint1:#BB8EFF;
+    --tint2:#D2B4FF;
+    --tint3:#E9D9FF;
+
+    --ca:#FFA000;
+    --ca-tint:#FFF3DE;
+    --anz:#5FA300;
+    --anz-tint:#EFFCDA;
+    --uk:#0F9FCF;
+    --uk-tint:#DEF6FF;
+
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 24px 96px;}
+
+  h1,h2,h3{font-family:'Newsreader', Georgia, serif; font-weight:600; margin:0;}
+
+  /* ---------- HERO ---------- */
+  .hero{margin-bottom:36px;}
+  .eyebrow{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--secondary); font-weight:700; margin-bottom:14px;
+  }
+  .hero h1{font-size:42px; letter-spacing:-0.01em; margin-bottom:14px; color:var(--ink);}
+  .hero p{font-size:16.5px; color:var(--muted); max-width:640px; margin:0;}
+
+  .flag-row{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap;}
+  .flag-chip{
+    display:flex; align-items:center; gap:7px;
+    background:var(--surface); border:1px solid var(--line);
+    padding:7px 14px 7px 10px; border-radius:999px;
+    font-size:13.5px; font-weight:600; color:var(--ink);
+  }
+  .dot{width:9px;height:9px;border-radius:50%; flex:none;}
+
+  /* ---------- FILTER BAR ---------- */
+  .filterbar{
+    position:sticky; top:16px; z-index:20;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:999px; padding:6px; display:inline-flex; gap:4px;
+    margin-bottom:8px; box-shadow:0 4px 18px rgba(45,6,73,.10);
+  }
+  .filterbar button{
+    border:none; background:transparent; cursor:pointer;
+    font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; font-weight:600;
+    color:var(--muted); padding:9px 18px; border-radius:999px;
+    transition:background .18s ease, color .18s ease;
+  }
+  .filterbar button.active{background:var(--ink); color:#fff;}
+  .filterbar button[data-region="ca"].active{background:var(--ca); color:#2D0649;}
+  .filterbar button[data-region="anz"].active{background:var(--anz); color:#fff;}
+  .filterbar button[data-region="uk"].active{background:var(--uk); color:#fff;}
+
+  .filter-note{font-size:12.5px; color:var(--muted); margin:0 0 26px 6px;}
+
+  /* ---------- SECTIONS ---------- */
+  .section-label{
+    font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--secondary); font-weight:700; margin:44px 0 14px; padding-left:2px;
+  }
+
+  .feature-card{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); margin-bottom:14px; overflow:hidden;
+  }
+  .feature-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px; cursor:pointer; user-select:none;
+  }
+  .feature-head h3{font-size:18px; color:var(--ink);}
+  .chevron{transition:transform .2s ease; color:var(--primary); font-size:14px;}
+  .feature-card.open .chevron{transform:rotate(180deg);}
+
+  .feature-body{
+    max-height:0; overflow:hidden; transition:max-height .3s ease;
+  }
+  .feature-body-inner{padding:0 20px 20px;}
+
+  .row{
+    display:grid; grid-template-columns:150px repeat(3,1fr); gap:14px;
+    padding:14px 0; border-top:1px solid var(--line);
+  }
+  .row:first-child{border-top:none;}
+  .row-label{font-size:13px; font-weight:600; color:var(--muted); padding-top:2px;}
+
+  .cell{
+    font-size:13.8px; padding:12px 13px; border-radius:10px;
+    background:#FAF7FE; border:1px solid transparent; color:var(--ink);
+    transition:opacity .2s ease, background .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .cell .region-tag{display:block; font-weight:700; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:5px;}
+  .cell.ca .region-tag{color:#C97D00;}
+  .cell.anz .region-tag{color:#4C8500;}
+  .cell.uk .region-tag{color:#0B7FA6;}
+
+  .cell.dim{opacity:.32;}
+  .cell.hi{transform:translateY(-2px);}
+  .cell.hi.ca{background:var(--ca-tint); border-color:var(--ca);}
+  .cell.hi.anz{background:var(--anz-tint); border-color:var(--anz);}
+  .cell.hi.uk{background:var(--uk-tint); border-color:var(--uk);}
+
+  @media (max-width:760px){
+    .row{grid-template-columns:1fr; gap:8px; padding:16px 0;}
+    .row-label{padding-top:0; font-size:12.5px;}
+    .hero h1{font-size:32px;}
+    .filterbar{overflow-x:auto; max-width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Product Training · Regional Differences</div>
+    <h1>Regional Feature Snapshot</h1>
+    <p>How Employment Hero's product differs across Canada, ANZ, and the UK. Filter by region below to focus the comparison, or scroll for the full picture.</p>
+    <div class="flag-row">
+      <div class="flag-chip"><span class="dot" style="background:var(--ca)"></span>🇨🇦 Canada</div>
+      <div class="flag-chip"><span class="dot" style="background:var(--anz)"></span>🇦🇺🇳🇿 ANZ</div>
+      <div class="flag-chip"><span class="dot" style="background:var(--uk)"></span>🇬🇧 UK</div>
+    </div>
+  </div>
+
+  <div class="filterbar" id="filterbar">
+    <button class="active" data-region="all">All regions</button>
+    <button data-region="ca">🇨🇦 Canada</button>
+    <button data-region="anz">🇦🇺🇳🇿 ANZ</button>
+    <button data-region="uk">🇬🇧 UK</button>
+  </div>
+  <p class="filter-note">Tap a region to spotlight its column across every feature area below.</p>
+
+  <div class="section-label">Feature-by-feature comparison</div>
+  <div id="feature-cards"></div>
+
+</div>
+
+<script>
+const FEATURES = [
+  {
+    area: 'Plan structure',
+    rows: [
+      {
+        label: 'Tier names',
+        ca: 'Classic naming: Standard, Premium, Platinum, Unlimited.',
+        anz: 'New EOS v2 naming: HR Essentials, HR Engage, HR Elite, Unlimited.',
+        uk: 'New naming: Essentials, Engage, Elite, Unlimited.'
+      },
+      {
+        label: 'Who sees new plans',
+        ca: 'N/A — no relaunch underway.',
+        anz: 'New customers only. Existing customers keep their current plan, no forced migration.',
+        uk: 'Same rule as ANZ — new customers only.'
+      }
+    ]
+  },
+  {
+    area: 'Payroll',
+    rows: [
+      {
+        label: 'Payroll plan',
+        ca: 'Payroll add-on unlocks self-serve payroll; separate Managed Payroll tier with a dedicated Payroll Specialist.',
+        anz: 'Two old tiers (Standard/Premium) merged into one Core Payroll plan.',
+        uk: '"Premium Payroll" renamed to Core Payroll (same single-plan model as ANZ).'
+      }
+    ]
+  },
+  {
+    area: 'Time &amp; attendance (T&amp;A)',
+    rows: [
+      {
+        label: "How it's packaged",
+        ca: 'Bundled into plans by tier — not sold separately.',
+        anz: "Removed from HR plans, now a standalone add-on. Requires a HR plan (can't attach to Payroll-only).",
+        uk: 'Same add-on model as ANZ; requires a HR plan, and can be added to Elite and below. Remains included in Unlimited.'
+      }
+    ]
+  },
+  {
+    area: 'HR advisory',
+    rows: [
+      {
+        label: 'Delivery model',
+        ca: 'Delivered via external partners. Unlimited plan includes 15 min/employee/year covering advice, compliance checks &amp; document creation — but explicitly excludes handbook creation.',
+        anz: 'Available as a paid add-on across tiers.',
+        uk: 'Same general advisory framing as ANZ.'
+      }
+    ]
+  },
+  {
+    area: 'AI recruitment agent',
+    rows: [
+      {
+        label: 'Recruitment Agent (AI)',
+        ca: 'Included in Premium, Platinum and Unlimited (not an add-on). Monthly credit allowance of 15/30/70 respectively, doesn\'t roll over. Top-up credits available, don\'t expire.',
+        anz: 'Originally a paid add-on; changed 24 Feb 2026 to bundle into eligible paid plans with a usage credit cap rather than sold separately.',
+        uk: 'Standalone add-on removed, folded into eligible plans. Included from HR Engage upward — not part of entry-level HR Essentials.'
+      }
+    ]
+  },
+  {
+    area: 'HeroForce',
+    rows: [
+      {
+        label: 'HeroForce models',
+        ca: 'Only Employ Globally is live. Employ Locally and Employ on Demand are on hold / coming soon.',
+        anz: 'All three models available: Employ Locally and Employ Globally live; Employ on Demand coming soon.',
+        uk: 'Same stage as ANZ — Employ Locally and Employ Globally live, Employ on Demand coming soon.'
+      }
+    ]
+  }
+];
+
+function buildFeatureCards(){
+  const container = document.getElementById('feature-cards');
+  FEATURES.forEach((feat, i) => {
+    const card = document.createElement('div');
+    card.className = 'feature-card' + (i === 0 ? ' open' : '');
+
+    const rowsHtml = feat.rows.map(r => `
+      <div class="row">
+        <div class="row-label">${r.label}</div>
+        <div class="cell ca" data-region="ca"><span class="region-tag">🇨🇦 Canada</span>${r.ca}</div>
+        <div class="cell anz" data-region="anz"><span class="region-tag">🇦🇺🇳🇿 ANZ</span>${r.anz}</div>
+        <div class="cell uk" data-region="uk"><span class="region-tag">🇬🇧 UK</span>${r.uk}</div>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="feature-head">
+        <h3>${feat.area}</h3>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="feature-body"><div class="feature-body-inner">${rowsHtml}</div></div>
+    `;
+
+    const head = card.querySelector('.feature-head');
+    const body = card.querySelector('.feature-body');
+    head.addEventListener('click', () => {
+      const isOpen = card.classList.contains('open');
+      card.classList.toggle('open', !isOpen);
+      body.style.maxHeight = !isOpen ? body.scrollHeight + 'px' : '0px';
+    });
+
+    container.appendChild(card);
+    if(i === 0){ body.style.maxHeight = body.scrollHeight + 'px'; }
+  });
+}
+
+function setRegionFilter(region){
+  document.querySelectorAll('#filterbar button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.region === region);
+  });
+  document.querySelectorAll('.cell').forEach(cell=>{
+    cell.classList.remove('dim','hi');
+    if(region === 'all') return;
+    if(cell.dataset.region === region){
+      cell.classList.add('hi');
+    } else {
+      cell.classList.add('dim');
+    }
+  });
+  document.querySelectorAll('.feature-card.open .feature-body').forEach(b=>{
+    b.style.maxHeight = b.scrollHeight + 'px';
+  });
+}
+
+document.getElementById('filterbar').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  setRegionFilter(btn.dataset.region);
+});
+
+buildFeatureCards();
+</script>
+</body>
+</html>
